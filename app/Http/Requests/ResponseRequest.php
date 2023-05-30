@@ -32,10 +32,10 @@ class ResponseRequest extends FormRequest
                 'required',
                 Rule::exists('questions', 'id'),
             ],
-            'med_id' => [
-                'required',
-                Rule::exists('doctors', 'id'),
-            ],
+            // 'med_id' => [
+            //     'required',
+            //     Rule::exists('doctors', 'id'),
+            // ],
         ];
     }
 }
