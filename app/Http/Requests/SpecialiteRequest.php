@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class PostRequest extends FormRequest
+class SpecialiteRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,14 +23,11 @@ class PostRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title'=> 'required|string',
-            'image'=> 'image|mimes:png,jpeg,svg,jpg|max:5000',
-            'description'=> 'required|string',
-            'type'=> 'required|string',
-            'user_id' => [
+            'nom'=>'required',
+            'med_id' => [
                 'required',
-                Rule::exists('users', 'id'),
-            ]
+                Rule::exists('doctors', 'id'),
+            ],
         ];
     }
 }

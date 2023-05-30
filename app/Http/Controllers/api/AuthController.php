@@ -13,31 +13,39 @@ use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
-    public function Index() {
+    public function Index()
+    {
         return User::all();
-        
     }
-    //get user details
-    public function user(){
-        return response([
-            'user'=>auth()->user()
-        ],200);
-    }
-    
 
-    public function Register(Request $request) {
+    //get user details
+    public function user()
+    {
+        return response([
+            'user' => auth()->user()
+        ], 200);
+    }
+
+
+    public function Register(Request $request)
+    {
         try {
-            $validate = Validator::make($request->all(),[
+            $validate = Validator::make($request->all(), [
                 'name' => 'required',
+                'num_tel' => 'required|integer',
+                'adresse' => 'required',
+                'ville' => 'required',
+                'sexe' => 'required',
+                'num_cnam' => 'required|integer',
                 'email' => 'required|email|unique:users,email',
                 'password' => 'required|min:8',
                 'role' => 'required|',
             ]);
-            if ($validate->fails()){
+            if ($validate->fails()) {
                 return response()->json([
-                    'status'=> false,
-                    'message'=>'validation failed',
-                    'errors'=> $validate->errors()
+                    'status' => false,
+                    'message' => 'validation failed',
+                    'errors' => $validate->errors()
                 ], 401);
             }
             $user = User::create([
@@ -45,19 +53,18 @@ class AuthController extends Controller
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
                 'role' => $request->role,
-       ] );
+            ]);
 
             return response()->json([
-                'status'=> true,
-                'message'=>'User created succf',
-                'token'=> $user->createToken("API TOKEN")->plainTextToken,
-                'data'=>$user
+                'status' => true,
+                'message' => 'User created succf',
+                'token' => $user->createToken("API TOKEN")->plainTextToken,
+                'data' => $user
             ], 201);
-
         } catch (\Throwable $th) {
             return response()->json([
-                'status'=> false,
-                'message'=>$th->getMessage()
+                'status' => false,
+                'message' => $th->getMessage()
             ], 500);
         }
     }
@@ -94,8 +101,8 @@ class AuthController extends Controller
                 'status' => true,
                 'message' => 'User Logged In Successfully',
                 'token' => $user->createToken("API TOKEN")->plainTextToken,
-                'data'=>$user
-                
+                'data' => $user
+
             ], 200);
         } catch (\Throwable $th) {
             return response()->json([
@@ -105,7 +112,8 @@ class AuthController extends Controller
         }
     }
 
-    public function Logout(Request $request){
+    public function Logout(Request $request)
+    {
         try {
             $user = $request->user();
             if (!$user) {
@@ -129,25 +137,26 @@ class AuthController extends Controller
         }
     }
 
-    public function Validate_Mail(Request $request) {
+    public function Validate_Mail(Request $request)
+    {
 
         try {
-            $validate = Validator::make($request->all(),[
+            $validate = Validator::make($request->all(), [
                 'email' => 'required|email',
             ]);
-            if ($validate->fails()){
+            if ($validate->fails()) {
                 return response()->json([
-                    'status'=> false,
-                    'message'=>'validation failed',
-                    'errors'=> $validate->errors()
+                    'status' => false,
+                    'message' => 'validation failed',
+                    'errors' => $validate->errors()
                 ], 401);
             }
 
             $user = User::where('email', $request->email)->first();
             if (!$user) {
                 return response()->json([
-                    'status'=> false,
-                    'message'=>'user doesn"t exist',
+                    'status' => false,
+                    'message' => 'user doesn"t exist',
                 ], 401);
             }
             // $password = Str::password(8);
@@ -166,54 +175,95 @@ class AuthController extends Controller
                 'code' => $password
             ];
 
-            Mail::send('email_template',$mail_data, function($message) use ($mail_data){
+            Mail::send('email_template', $mail_data, function ($message) use ($mail_data) {
                 $message->to($mail_data['recipient'])
-                ->from($mail_data['fromEmail'])
-                ->subject($mail_data['subject']);
-
+                    ->from($mail_data['fromEmail'])
+                    ->subject($mail_data['subject']);
             });
 
             return response()->json([
-                'status'=> true,
-                'message'=>'Email was sent',
-                'data'=>$user,
+                'status' => true,
+                'message' => 'Email was sent',
+                'data' => $user,
 
             ], 200);
         } catch (\Throwable $th) {
             return response()->json([
-                'status'=> false,
-                'message'=>$th->getMessage()
+                'status' => false,
+                'message' => $th->getMessage()
             ], 500);
         }
     }
 
-    public function Update_forgoten_password(Request $request) {
+    public function Verif_code(Request $request)
+    {
 
         try {
-            $validate = Validator::make($request->all(),[
+            $validate = Validator::make($request->all(), [
                 'email' => 'required|email',
-                'verification_code' => 'required',
-                'password' => 'required',
+                'verification_code' => 'required'
             ]);
-            if ($validate->fails()){
+
+            if ($validate->fails()) {
                 return response()->json([
-                    'status'=> false,
-                    'message'=>'validation failed',
-                    'errors'=> $validate->errors()
+                    'status' => false,
+                    'message' => 'validation failed',
+                    'errors' => $validate->errors()
                 ], 401);
             }
 
             $user = User::where('email', $request->email)->first();
             if (!$user) {
                 return response()->json([
-                    'status'=> false,
-                    'message'=>'user doesn"t exist',
+                    'status' => false,
+                    'message' => 'user doesn"t exist',
                 ], 401);
             }
+
             if ($user->verification_code !== $request->verification_code) {
                 return response()->json([
-                    'status'=> false,
-                    'message'=>'incorect verification code',
+                    'status' => false,
+                    'message' => 'incorect verification code',
+                ], 401);
+            }
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Verified succefully',
+                'data' => $user,
+
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => $th->getMessage()
+            ], 500);
+        }
+    }
+
+    public function Update_password(Request $request)
+    {
+
+        try {
+            $validate = Validator::make($request->all(), [
+                'email' => 'required|email',
+                'password' => 'required',
+            ]);
+
+            if ($validate->fails()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'validation failed',
+                    'errors' => $validate->errors()
+                ], 401);
+            }
+
+            $user = User::where('email', $request->email)->first();
+
+            if (!$user) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'user doesn"t exist',
                 ], 401);
             }
 
@@ -221,16 +271,17 @@ class AuthController extends Controller
             $user->save();
 
             return response()->json([
-                'status'=> true,
-                'message'=>'Email was sent & password was updated',
+                'status' => true,
+                'message' => 'Email was sent & password was updated',
+                'data' => $user
 
             ], 200);
         } catch (\Throwable $th) {
             return response()->json([
-                'status'=> false,
-                'message'=>$th->getMessage()
+                'status' => false,
+                'message' => $th->getMessage()
             ], 500);
         }
     }
-   
+
 }

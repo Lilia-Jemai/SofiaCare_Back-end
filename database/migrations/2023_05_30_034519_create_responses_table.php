@@ -11,14 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('posts', function (Blueprint $table) {
+        Schema::create('responses', function (Blueprint $table) {
             $table->id();
-            $table->String('title');
-            $table->String('image');
-            $table->String('description');
-            $table->String('type');
+            $table->String('response');
+            // $table->unsignedBigInteger('question_id');
             // $table->unsignedBigInteger('user_id');
+            // $table->unsignedBigInteger('med_id');
+            $table->foreignId('question_id')->constrained('questions');
             $table->foreignId('user_id')->constrained('users');
+            // $table->foreignId('medic_id')->constrained('medics');
             $table->timestamps();
         });
     }
@@ -28,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('posts');
+        Schema::dropIfExists('responses');
     }
 };

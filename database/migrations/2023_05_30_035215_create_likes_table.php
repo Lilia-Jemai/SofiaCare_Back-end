@@ -11,13 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('posts', function (Blueprint $table) {
+        Schema::create('likes', function (Blueprint $table) {
             $table->id();
-            $table->String('title');
-            $table->String('image');
-            $table->String('description');
-            $table->String('type');
+            $table->boolean('like');
+            // $table->unsignedBigInteger('post_id');
             // $table->unsignedBigInteger('user_id');
+            $table->foreignId('post_id')->constrained('posts');
             $table->foreignId('user_id')->constrained('users');
             $table->timestamps();
         });
@@ -28,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('posts');
+        Schema::dropIfExists('likes');
     }
 };
