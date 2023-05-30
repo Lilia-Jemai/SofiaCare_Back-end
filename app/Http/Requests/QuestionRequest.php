@@ -28,10 +28,10 @@ class QuestionRequest extends FormRequest
                 'required',
                 Rule::exists('users', 'id'),
             ],
-            'med_id' => [
-                'required',
-                Rule::exists('doctors', 'id'),
-            ],
+            // 'med_id' => [
+            //     'required',
+            //     Rule::exists('doctors', 'id'),
+            // ],
         ];
     }
 }

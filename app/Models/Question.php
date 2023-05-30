@@ -11,7 +11,7 @@ class Question extends Model
 
     protected $fillable = [
         'question',
-        'medic_id',
+        // 'medic_id',
         'user_id'
     ];
 
@@ -19,7 +19,7 @@ class Question extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function medic(){
-        return $this->belongsTo(Medic::class);
-    }
+    // public function medic(){
+    //     return $this->belongsTo(Medic::class);
+    // }
 }
