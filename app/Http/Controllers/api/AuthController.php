@@ -32,11 +32,11 @@ class AuthController extends Controller
         try {
             $validate = Validator::make($request->all(), [
                 'name' => 'required',
-                'num_tel' => 'required|integer',
-                'adresse' => 'required',
-                'ville' => 'required',
-                'sexe' => 'required',
-                'num_cnam' => 'required|integer',
+                'num_tel' => 'integer',
+                'adresse' => 'String',
+                'ville' => 'String',
+                'sexe' => 'String',
+                'num_cnam' => '|integer',
                 'email' => 'required|email|unique:users,email',
                 'password' => 'required|min:8',
                 'role' => 'required',
