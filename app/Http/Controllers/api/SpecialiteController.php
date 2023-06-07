@@ -12,7 +12,7 @@ class SpecialiteController extends Controller
     public function index()
     {
         // return response()->json("function index works");
-        return Specialite::with('medic')->get();;
+        return Specialite::all();
     }
 
     public function show(Specialite $specialite)
@@ -20,7 +20,7 @@ class SpecialiteController extends Controller
         return $specialite;
     }
 
-    public function store(Specialite $request)
+    public function store(SpecialiteRequest $request)
     {
 
         Specialite::create($request->validated());

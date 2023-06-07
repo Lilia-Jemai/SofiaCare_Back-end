@@ -5,14 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Question extends Model
+class Patient extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'question',
+        'etat',
+        'user_id',
         'medic_id',
-        'user_id'
     ];
 
     public function user(){

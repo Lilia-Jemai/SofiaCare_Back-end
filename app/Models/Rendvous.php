@@ -5,18 +5,18 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Question extends Model
+class Rendvous extends Model
 {
     use HasFactory;
-
     protected $fillable = [
-        'question',
+        'time',
+        'date',
         'medic_id',
-        'user_id'
+        'patient_id'
     ];
 
-    public function user(){
-        return $this->belongsTo(User::class);
+    public function patient(){
+        return $this->belongsTo(Patient::class);
     }
 
     public function medic(){

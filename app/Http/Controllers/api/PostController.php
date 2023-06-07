@@ -16,6 +16,12 @@ class PostController extends Controller
         return Post::with('user')->get();
     }
 
+    public function show(Post $post)
+    {
+        $post->load('user');
+        return $post;
+    }
+
     public function store(PostRequest $request)
     {
 

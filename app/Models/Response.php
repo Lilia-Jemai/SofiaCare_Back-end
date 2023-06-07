@@ -12,16 +12,16 @@ class Response extends Model
     protected $fillable = [
         'response',
         'question_id',
-        // 'medic_id',
+        'medic_id',
         'user_id'
     ];
 
     public function question(){
         return $this->belongsTo(Question::class);
     }
-    // public function medic(){
-    //     return $this->belongsTo(Medic::class);
-    // }
+    public function medic(){
+        return $this->belongsTo(Medic::class);
+    }
     public function user(){
         return $this->belongsTo(User::class);
     }

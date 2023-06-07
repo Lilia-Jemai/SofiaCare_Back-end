@@ -5,13 +5,19 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Specialite extends Model
+class Medicament extends Model
 {
     use HasFactory;
-
     protected $fillable = [
         'nom',
-    ];
+        'date',
+        'period',
+        'dosssier_id'
+     ];
+
+     public function dossier(){
+         return $this->belongsTo(Dossier::class);
+     }
 
 
 }

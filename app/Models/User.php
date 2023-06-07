@@ -19,6 +19,7 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
+        'image',
         'num_tel',
         'adresse',
         'ville',
@@ -49,14 +50,21 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public function doctor(){
-        return $this->hasOne(Doctor::class,'doc_id');
+    public function medic()
+    {
+        return $this->hasOne(Medic::class);
     }
-    public function user_details(){
-        return $this->hasOne(UserDetails::class,'user_id');
+    public function patient()
+    {
+        return $this->hasOne(Patient::class);
     }
+    // public function user_details()
+    // {
+    //     return $this->hasOne(UserDetails::class, 'user_id');
+    // }
     public function posts()
     {
         return $this->hasMany(Post::class, 'user_id');
     }
+
 }

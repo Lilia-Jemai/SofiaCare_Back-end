@@ -3,11 +3,14 @@
 namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Medic;
+use App\Models\Patient;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
@@ -32,13 +35,14 @@ class AuthController extends Controller
         try {
             $validate = Validator::make($request->all(), [
                 'name' => 'required',
+                'image'=> 'image|mimes:png,jpeg,svg,jpg|max:5000',
                 'num_tel' => 'integer',
                 'adresse' => 'String',
                 'ville' => 'String',
                 'sexe' => 'String',
-                'num_cnam' => '|integer',
+                'num_cnam' => 'integer',
                 'email' => 'required|email|unique:users,email',
-                'password' => 'required|min:8',
+                // 'password' => 'required|min:8',
                 'role' => 'required',
             ]);
             if ($validate->fails()) {
@@ -48,6 +52,7 @@ class AuthController extends Controller
                     'errors' => $validate->errors()
                 ], 401);
             }
+            $password = rand(10000000, 99999999);
             $user = User::create([
                 'name' => $request->name,
                 'num_tel' => $request->num_tel,
@@ -56,9 +61,24 @@ class AuthController extends Controller
                 'sexe' => $request->sexe,
                 'num_cnam' => $request->num_cnam,
                 'email' => $request->email,
-                'password' => Hash::make($request->password),
+                'password' => Hash::make($password),
                 'role' => $request->role,
             ]);
+
+            if ($request->role === 'patient') {
+                $patient = new Patient();
+                $patient->etat = $request->etat;
+                $patient->medic_id = $request->medic_id;
+                $user->patient()->save($patient);
+            } elseif ($request->input('role') === 'medic') {
+                $medic = new Medic();
+                $medic->category = $request->category;
+                $medic->patient = $request->patient;
+                $medic->experience = $request->experience;
+                $medic->bio_data = $request->bio_data;
+                $medic->spec_id = $request->spec_id;
+                $user->medic()->save($medic);
+            }
 
             return response()->json([
                 'status' => true,
@@ -287,6 +307,20 @@ class AuthController extends Controller
                 'message' => $th->getMessage()
             ], 500);
         }
+    }
+
+    public function search(Request $request)
+    {
+        $text = $request->input('text');
+
+        $results = User::where(function ($query) use ($text) {
+            $columns = Schema::getColumnListing('users');
+            foreach ($columns as $column) {
+                $query->orWhere($column, 'LIKE', '%' . $text . '%');
+            }
+        })->get();
+
+        return response()->json($results);
     }
 
 }

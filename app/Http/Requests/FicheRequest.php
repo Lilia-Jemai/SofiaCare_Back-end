@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class SpecialiteRequest extends FormRequest
+class FicheRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,11 +23,13 @@ class SpecialiteRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'nom'=>'required',
-            // 'med_id' => [
-            //     'required',
-            //     Rule::exists('doctors', 'id'),
-            // ],
+
+            'image'=> 'image|mimes:png,jpeg,svg,jpg|max:5000',
+            'Note'=>'string',
+            'dossier_id' => [
+                'required',
+                Rule::exists('dossiers', 'id'),
+            ],
         ];
     }
 }

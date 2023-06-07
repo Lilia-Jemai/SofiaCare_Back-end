@@ -15,6 +15,7 @@ class ResponseController extends Controller
     }
 
     public function show(Response $response) {
+        $response->load('user', 'question', 'medic');
         return $response;
     }
 

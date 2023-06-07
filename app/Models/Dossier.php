@@ -5,19 +5,24 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Question extends Model
+class Dossier extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'question',
+        'nom',
+        'prenom',
+        'date_naissance',
+        'sexe',
+        'tel',
+        'email',
+        'cnam',
+        'diagnostique',
+        'medicament',
+        'symptome',
+        'description',
         'medic_id',
-        'user_id'
     ];
-
-    public function user(){
-        return $this->belongsTo(User::class);
-    }
 
     public function medic(){
         return $this->belongsTo(Medic::class);

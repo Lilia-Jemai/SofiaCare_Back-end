@@ -17,7 +17,7 @@ return new class extends Migration
             // $table->unsignedBigInteger('user_id');
             // $table->unsignedBigInteger('med_id');
             $table->foreignId('user_id')->constrained('users');
-            // $table->foreignId('medic_id')->constrained('medics');
+            $table->foreignId('medic_id')->constrained('medics');
             $table->timestamps();
         });
     }
