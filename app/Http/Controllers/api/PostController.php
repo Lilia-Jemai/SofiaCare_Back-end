@@ -8,6 +8,8 @@ use App\Models\Post;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Http\Request;
 
 class PostController extends Controller
 {
@@ -62,5 +64,19 @@ class PostController extends Controller
     {
         $post->delete();
         return response()->json('ticketdeleted succefully');
+    }
+
+    public function search(Request $request)
+    {
+        $searchTerm = $request->input('search');
+
+        $results = Post::where(function ($query) use ($searchTerm) {
+            $columns = Schema::getColumnListing('posts');
+            foreach ($columns as $column) {
+                $query->orWhere($column, 'LIKE', '%' . $searchTerm . '%');
+            }
+        })->get();
+
+        return response()->json($results);
     }
 }

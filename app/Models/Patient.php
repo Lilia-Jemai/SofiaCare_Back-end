@@ -11,6 +11,7 @@ class Patient extends Model
 
     protected $fillable = [
         'etat',
+        'fcmtoken',
         'user_id',
         'medic_id',
     ];

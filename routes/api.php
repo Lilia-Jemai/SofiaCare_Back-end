@@ -23,18 +23,28 @@ Route::middleware(['auth:sanctum'])->group(function () {
 Route::get('users', [AuthController::class, 'Index']);
 
 Route::resource('/post', PostController::class);
+Route::post('/post/search', [PostController::class, 'search']);
 Route::get('/patient/user/{user_id}', [PatientController::class, 'findByUserId']);
 Route::resource('/patient', PatientController::class);
+Route::post('/patient/search', [PatientController::class, 'search']);
 
 Route::resource('/dossier', DossierController::class);
+Route::post('/dossier/search', [DossierController::class, 'search']);
+
 Route::resource('/rendvous', RendvousController::class);
+Route::post('/rendevous/search', [RendvousController::class, 'search']);
 
 Route::resource('/comment', CommentController::class);
+Route::post('/comment/search', [CommentController::class, 'search']);
 Route::resource('/like', LikeController::class);
 Route::resource('/medic', MedicController::class);
+Route::post('/medic/search', [MedicController::class, 'search']);
 Route::resource('/question', QuestionController::class);
+Route::post('/question/search', [QuestionController::class, 'search']);
 Route::resource('/response', ResponseController::class);
+Route::post('/response/search', [ResponseController::class, 'search']);
 Route::resource('/specialite', SpecialiteController::class);
+Route::post('/specialite/search', [SpecialiteController::class, 'search']);
 
 Route::post('/auth/register', [AuthController::class, 'Register']);
 Route::post('/auth/login', [AuthController::class, 'Login']);

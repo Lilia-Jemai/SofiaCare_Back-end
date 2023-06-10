@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 
 class FicheController extends Controller
 {
@@ -65,5 +66,19 @@ class FicheController extends Controller
     {
         $fiche->delete();
         return response()->json("Fiche was deleted successfuly!!");
+    }
+
+    public function search(Request $request)
+    {
+        $searchTerm = $request->input('search');
+
+        $results = Fiche::where(function ($query) use ($searchTerm) {
+            $columns = Schema::getColumnListing('fiches');
+            foreach ($columns as $column) {
+                $query->orWhere($column, 'LIKE', '%' . $searchTerm . '%');
+            }
+        })->get();
+
+        return response()->json($results);
     }
 }

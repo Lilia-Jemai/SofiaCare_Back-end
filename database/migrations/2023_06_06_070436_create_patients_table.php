@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('patients', function (Blueprint $table) {
             $table->id();
             $table->String('etat');
+            $table->string('fcmtoken')->nullable();
             $table->foreignId('user_id')->constrained('users');
             $table->foreignId('medic_id')->constrained('medics');
             $table->timestamps();

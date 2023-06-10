@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\ResponseRequest;
 use App\Models\Response;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 
 class ResponseController extends Controller
 {
@@ -35,4 +36,19 @@ class ResponseController extends Controller
         $response->delete();
         return response()->json("Response was deleted successfuly!!");
     }
+
+    public function search(Request $request)
+    {
+        $searchTerm = $request->input('search');
+
+        $results = Response::where(function ($query) use ($searchTerm) {
+            $columns = Schema::getColumnListing('responses');
+            foreach ($columns as $column) {
+                $query->orWhere($column, 'LIKE', '%' . $searchTerm . '%');
+            }
+        })->get();
+
+        return response()->json($results);
+    }
+
 }

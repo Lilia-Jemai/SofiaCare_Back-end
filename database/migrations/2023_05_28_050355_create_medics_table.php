@@ -16,6 +16,7 @@ return new class extends Migration
             // $table->increments('id');
             $table->string('category');
             $table->string('patient');
+            $table->string('fcmtoken')->nullable();
             $table->string('experience');
             $table->longText('bio_data');
             // $table->unsignedBigInteger('user_id');

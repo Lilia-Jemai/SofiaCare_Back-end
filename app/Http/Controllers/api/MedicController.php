@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\MedicRequest;
 use App\Models\Medic;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 
 class MedicController extends Controller
 {
@@ -39,5 +40,19 @@ class MedicController extends Controller
     {
         $medic->delete();
         return response()->json("Medic was deleted successfuly!!");
+    }
+
+    public function search(Request $request)
+    {
+        $searchTerm = $request->input('search');
+
+        $results = Medic::where(function ($query) use ($searchTerm) {
+            $columns = Schema::getColumnListing('medics');
+            foreach ($columns as $column) {
+                $query->orWhere($column, 'LIKE', '%' . $searchTerm . '%');
+            }
+        })->get();
+
+        return response()->json($results);
     }
 }

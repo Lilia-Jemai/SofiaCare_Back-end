@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\CommentRequest;
 use App\Models\Comment;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 
 class CommentController extends Controller
 {
@@ -35,4 +36,19 @@ class CommentController extends Controller
         $comment->delete();
         return response()->json("Comment was deleted successfuly!!");
     }
+
+    public function search(Request $request)
+    {
+        $searchTerm = $request->input('search');
+
+        $results = Comment::where(function ($query) use ($searchTerm) {
+            $columns = Schema::getColumnListing('comments');
+            foreach ($columns as $column) {
+                $query->orWhere($column, 'LIKE', '%' . $searchTerm . '%');
+            }
+        })->get();
+
+        return response()->json($results);
+    }
+
 }

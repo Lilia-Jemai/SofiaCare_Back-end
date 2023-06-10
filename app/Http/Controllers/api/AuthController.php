@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class AuthController extends Controller
 {
@@ -35,7 +36,7 @@ class AuthController extends Controller
         try {
             $validate = Validator::make($request->all(), [
                 'name' => 'required',
-                'image'=> 'image|mimes:png,jpeg,svg,jpg|max:5000',
+                'image' => 'image|mimes:png,jpeg,svg,jpg|max:5000',
                 'num_tel' => 'integer',
                 'adresse' => 'String',
                 'ville' => 'String',
@@ -52,6 +53,7 @@ class AuthController extends Controller
                     'errors' => $validate->errors()
                 ], 401);
             }
+            $imageName = Str::random(32) . "." . $request->image->getClientOriginalExtension();
             $password = rand(10000000, 99999999);
             $user = User::create([
                 'name' => $request->name,
@@ -61,14 +63,17 @@ class AuthController extends Controller
                 'sexe' => $request->sexe,
                 'num_cnam' => $request->num_cnam,
                 'email' => $request->email,
+                'image' => $imageName,
                 'password' => Hash::make($password),
                 'role' => $request->role,
             ]);
+            Storage::disk('public')->put($imageName, file_get_contents($request->image));
 
             if ($request->role === 'patient') {
                 $patient = new Patient();
                 $patient->etat = $request->etat;
                 $patient->medic_id = $request->medic_id;
+                $patient->kfctoken = $request->kfctoken;
                 $user->patient()->save($patient);
             } elseif ($request->input('role') === 'medic') {
                 $medic = new Medic();
@@ -76,6 +81,7 @@ class AuthController extends Controller
                 $medic->patient = $request->patient;
                 $medic->experience = $request->experience;
                 $medic->bio_data = $request->bio_data;
+                $medic->kfctoken = $request->kfctoken;
                 $medic->spec_id = $request->spec_id;
                 $user->medic()->save($medic);
             }
@@ -122,6 +128,16 @@ class AuthController extends Controller
 
             $user = User::where('email', $request->email)->first();
 
+            if ($user->role === 'patient') {
+                $patient = $user->patient;
+                $patient->fcmtoken = $request->fcmtoken;
+                $patient->save();
+            } elseif ($user->role === 'medic') {
+                $medic = $user->medic;
+                $medic->fcmtoken = $request->fcmtoken;
+                $medic->save();
+            }
+
             return response()->json([
                 'status' => true,
                 'message' => 'User Logged In Successfully',
@@ -161,6 +177,91 @@ class AuthController extends Controller
             ], 500);
         }
     }
+
+    public function Update(Request $request, $id)
+    {
+        try {
+            $user = User::findOrFail($id);
+
+            $validate = Validator::make($request->all(), [
+                'name' => 'sometimes|required',
+                'image' => 'sometimes|image|mimes:png,jpeg,svg,jpg|max:5000',
+                'num_tel' => 'sometimes|integer',
+                'adresse' => 'sometimes|string',
+                'ville' => 'sometimes|string',
+                'sexe' => 'sometimes|string',
+                'num_cnam' => 'sometimes|integer',
+                'email' => 'sometimes|required|email|unique:users,email,' . $id,
+                'role' => 'sometimes|required',
+            ]);
+
+            if ($validate->fails()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Validation failed',
+                    'errors' => $validate->errors()
+                ], 401);
+            }
+
+            $data = [];
+
+            if ($request->has('name')) {
+                $data['name'] = $request->name;
+            }
+
+            if ($request->hasFile('image')) {
+                // Delete the old image if exists
+                if ($user->image && Storage::exists($user->image)) {
+                    Storage::delete($user->image);
+                }
+                $imageName = Str::random(32) . "." . $request->image->getClientOriginalExtension();
+                $imagePath = $request->file('image')->store('images', 'public');
+                $data['image'] = $imagePath;
+            }
+
+            if ($request->has('num_tel')) {
+                $data['num_tel'] = $request->num_tel;
+            }
+
+            if ($request->has('adresse')) {
+                $data['adresse'] = $request->adresse;
+            }
+
+            if ($request->has('ville')) {
+                $data['ville'] = $request->ville;
+            }
+
+            if ($request->has('sexe')) {
+                $data['sexe'] = $request->sexe;
+            }
+
+            if ($request->has('num_cnam')) {
+                $data['num_cnam'] = $request->num_cnam;
+            }
+
+            if ($request->has('email')) {
+                $data['email'] = $request->email;
+            }
+
+            if ($request->has('role')) {
+                $data['role'] = $request->role;
+            }
+
+            $user->update($data);
+
+            return response()->json([
+                'status' => true,
+                'message' => 'User updated successfully',
+                'data' => $user
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => $th->getMessage()
+            ], 500);
+        }
+    }
+
 
     public function Validate_Mail(Request $request)
     {
@@ -322,5 +423,4 @@ class AuthController extends Controller
 
         return response()->json($results);
     }
-
 }

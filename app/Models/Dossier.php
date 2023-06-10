@@ -19,7 +19,7 @@ class Dossier extends Model
         'cnam',
         'diagnostique',
         'medicament',
-        'symptome',
+        'synctome',
         'description',
         'medic_id',
     ];

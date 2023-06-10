@@ -12,6 +12,7 @@ class Medic extends Model
     protected $fillable = [
         'category',
         'patient',
+        'fcmtoken',
         'experience',
         'bio_data',
         'user_id',

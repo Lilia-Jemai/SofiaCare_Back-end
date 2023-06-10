@@ -7,6 +7,7 @@ use App\Http\Requests\MedicamentRequest;
 use App\Models\Medicament;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Schema;
 
 class MedicamentController extends Controller
 {
@@ -49,5 +50,19 @@ class MedicamentController extends Controller
     {
         $medicament->delete();
         return response()->json("Medicament was deleted successfuly!!");
+    }
+
+    public function search(Request $request)
+    {
+        $searchTerm = $request->input('search');
+
+        $results = Medicament::where(function ($query) use ($searchTerm) {
+            $columns = Schema::getColumnListing('medicaments');
+            foreach ($columns as $column) {
+                $query->orWhere($column, 'LIKE', '%' . $searchTerm . '%');
+            }
+        })->get();
+
+        return response()->json($results);
     }
 }
