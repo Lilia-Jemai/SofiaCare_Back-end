@@ -43,7 +43,7 @@ class AuthController extends Controller
                 'sexe' => 'String',
                 'num_cnam' => 'integer',
                 'email' => 'required|email|unique:users,email',
-                // 'password' => 'required|min:8',
+                'password' => 'required|min:8',
                 'role' => 'required',
             ]);
             if ($validate->fails()) {
@@ -54,7 +54,9 @@ class AuthController extends Controller
                 ], 401);
             }
             $imageName = Str::random(32) . "." . $request->image->getClientOriginalExtension();
-            $password = rand(10000000, 99999999);
+
+            $verification_code = rand(1000, 9999);
+
             $user = User::create([
                 'name' => $request->name,
                 'num_tel' => $request->num_tel,
@@ -64,8 +66,10 @@ class AuthController extends Controller
                 'num_cnam' => $request->num_cnam,
                 'email' => $request->email,
                 'image' => $imageName,
-                'password' => Hash::make($password),
+                'password' => Hash::make($request->password),
                 'role' => $request->role,
+                'verification_code'=> $verification_code,
+                'verified'=> false
             ]);
             Storage::disk('public')->put($imageName, file_get_contents($request->image));
 
@@ -73,7 +77,7 @@ class AuthController extends Controller
                 $patient = new Patient();
                 $patient->etat = $request->etat;
                 $patient->medic_id = $request->medic_id;
-                $patient->kfctoken = $request->kfctoken;
+                // $patient->kfctoken = $request->kfctoken;
                 $user->patient()->save($patient);
             } elseif ($request->input('role') === 'medic') {
                 $medic = new Medic();
@@ -81,10 +85,25 @@ class AuthController extends Controller
                 $medic->patient = $request->patient;
                 $medic->experience = $request->experience;
                 $medic->bio_data = $request->bio_data;
-                $medic->kfctoken = $request->kfctoken;
+                // $medic->kfctoken = $request->kfctoken;
                 $medic->spec_id = $request->spec_id;
                 $user->medic()->save($medic);
             }
+
+            $mail_data = [
+                'recipient' => $request->email,
+                'fromEmail' => "SofiaCareapp@gmail.com",
+                'fromName' => 'SofiaCare',
+                'subject' => 'Verifier Mail',
+                'body' => 'Mail Body',
+                'code' => $verification_code
+            ];
+
+            Mail::send('email_template', $mail_data, function ($message) use ($mail_data) {
+                $message->to($mail_data['recipient'])
+                    ->from($mail_data['fromEmail'])
+                    ->subject($mail_data['subject']);
+            });
 
             return response()->json([
                 'status' => true,
