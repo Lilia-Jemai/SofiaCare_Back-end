@@ -24,6 +24,7 @@ Route::get('users', [AuthController::class, 'Index']);
 
 Route::resource('/post', PostController::class);
 Route::post('/post/search', [PostController::class, 'search']);
+
 Route::get('/patient/user/{user_id}', [PatientController::class, 'findByUserId']);
 Route::resource('/patient', PatientController::class);
 Route::post('/patient/search', [PatientController::class, 'search']);
@@ -36,19 +37,27 @@ Route::post('/rendevous/search', [RendvousController::class, 'search']);
 
 Route::resource('/comment', CommentController::class);
 Route::post('/comment/search', [CommentController::class, 'search']);
+
 Route::resource('/like', LikeController::class);
+
 Route::resource('/medic', MedicController::class);
+Route::get('/medic/user/{user_id}', [MedicController::class, 'findByUserId']);
 Route::post('/medic/search', [MedicController::class, 'search']);
+
+
 Route::resource('/question', QuestionController::class);
 Route::post('/question/search', [QuestionController::class, 'search']);
+
 Route::resource('/response', ResponseController::class);
 Route::post('/response/search', [ResponseController::class, 'search']);
+
 Route::resource('/specialite', SpecialiteController::class);
 Route::post('/specialite/search', [SpecialiteController::class, 'search']);
 
 Route::post('/auth/register', [AuthController::class, 'Register']);
 Route::post('/auth/login', [AuthController::class, 'Login']);
 Route::get('/user', [AuthController::class, 'Index']);
+
 Route::get('/connected', [AuthController::class, 'user']);
 
 Route::post('/auth/verify', [AuthController::class, 'Validate_Mail']);

@@ -53,8 +53,6 @@ class AuthController extends Controller
                     'errors' => $validate->errors()
                 ], 401);
             }
-            $imageName = Str::random(32) . "." . $request->image->getClientOriginalExtension();
-
             $verification_code = rand(1000, 9999);
 
             $user = User::create([
@@ -65,13 +63,11 @@ class AuthController extends Controller
                 'sexe' => $request->sexe,
                 'num_cnam' => $request->num_cnam,
                 'email' => $request->email,
-                'image' => $imageName,
                 'password' => Hash::make($request->password),
                 'role' => $request->role,
                 'verification_code'=> $verification_code,
                 'verified'=> false
             ]);
-            Storage::disk('public')->put($imageName, file_get_contents($request->image));
 
             if ($request->role === 'patient') {
                 $patient = new Patient();

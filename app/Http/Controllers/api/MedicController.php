@@ -22,6 +22,19 @@ class MedicController extends Controller
         return $medic;
     }
 
+    public function findByUserId($user_id)
+    {
+        $medic = Medic::where('user_id', $user_id)->first();
+        if (!$medic) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Medicin doesnt exist.',
+            ], 401);
+        }
+        $medic->load('user', 'spec');
+        return $medic;
+    }
+
     public function store(MedicRequest $request)
     {
 
@@ -52,7 +65,7 @@ class MedicController extends Controller
                 $query->orWhere($column, 'LIKE', '%' . $searchTerm . '%');
             }
         })->get();
-
+        $results->load('user', 'spec');
         return response()->json($results);
     }
 }
